@@ -23,6 +23,7 @@ describe("#filter", () => {
 
   it("filters out excludes", () => {
     expect(filter({ str: "one\ntwo", excludes: [/two/] })).to.eql(["one"]);
+    expect(filter({ str: "one\ntwo\nthree", excludes: [/t/] })).to.eql(["one"]);
     expect(filter({ str: "one\ntwo", excludes: [/.*/] })).to.eql([]);
   });
 

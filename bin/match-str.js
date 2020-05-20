@@ -53,7 +53,7 @@ const getAction = (args) => {
 // Get RegExp.
 const getRegExps = ({ args, flags }) => flags
   .map((flag) => args
-    .map((val, i) => args[i - 1] === flag ? new RegExp(val, "gm") : null)
+    .map((val, i) => args[i - 1] === flag ? new RegExp(val) : null)
     .filter(Boolean)
   )
   .reduce((m, a) => m.concat(a), []);
