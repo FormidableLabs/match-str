@@ -32,9 +32,9 @@ Options:
 * Provides no stdout, just exit process with `0` for match or `1` for no match.
 * Matching logic is:
     0. Split lines at newline. Then, for each line:
-    1. If `-i` flags are provided, files are filtered to at least one match.
-    2. If `-e` flags are provided, files are excluded.
-    3. If any files remain, process exits `0` else `1`.
+    1. If `-i` flags are provided, lines are filtered to at least one match.
+    2. If `-e` flags are provided, lines are excluded.
+    3. If any lines remain, process exits `0` else `1`.
 * Can have multiple `-i` and `-e` options.
 
 [npm_img]: https://badge.fury.io/js/match-str.svg
