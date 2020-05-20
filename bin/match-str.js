@@ -3,13 +3,24 @@
 "use strict";
 
 const pkg = require("../package.json");
+const { isMatch } = require("../lib/index");
 
 const { log, error } = console;
 
 const USAGE = `
 Usage: ${pkg.name} [options]
 
-TODO: USAGE
+Options:
+  --str, -s       String to match on                      [String]
+  --include, -i   If provided, must match pattern         [RegExp]
+  --exclude, -e   If provided, cannot match pattern       [RegExp]
+  --help, -h      Show help                               [boolean]
+  --version, -v   Show version number                     [boolean]
+
+  Examples:
+  ${pkg.name} "one\\ntwo"             Exits 0. Matches by default
+  ${pkg.name} -i "^tw.+" "one\\ntwo"  Exits 0. Matches "two" at line start
+  ${pkg.name} -e "one" "one\\ntwo"    Exits 1 because of "one" exclusion
 `.trim();
 
 // ============================================================================
@@ -18,22 +29,38 @@ TODO: USAGE
 const help = async () => { log(USAGE); };
 const version = async () => { log(pkg.version); };
 
+// Matches and then **exits process** for upstream usage.
+const matchAndExit = async ({ str, includes, excludes }) => {
+  const matched = isMatch({ str, includes, excludes });
+  process.exit(matched ? 0 : 1); // eslint-disable-line no-process-exit
+};
+
 // ============================================================================
 // Configuration
 // ============================================================================
 // Get action or help / version name
-const getAction = (args, opts) => {
+const getAction = (args) => {
   // Return actions in priority order.
   if (args.includes("--help") || args.includes("-h")) { return help; }
   if (args.includes("--version") || args.includes("-v")) { return version; }
-  // TODO NORMAL ACTION
 
   // Default.
-  return help;
+  return matchAndExit;
 };
+
+// Get RegExp.
+const getRegExps = ({ args, flags }) => flags
+  .map((flag) => args
+    .map((val, i) => args[i - 1] === flag ? new RegExp(val, "gm") : null)
+    .filter(Boolean)
+  )
+  .reduce((m, a) => m.concat(a), []);
 
 // Get options for actions.
 const getOptions = (args) => ({
+  includes: getRegExps({ args, flags: ["--include", "-i"] }),
+  excludes: getRegExps({ args, flags: ["--exclude", "-e"] }),
+  str: args.find((val, i) => ["--str", "-s"].includes(args[i - 1]) ? val : null)
 });
 
 // ============================================================================
