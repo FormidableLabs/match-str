@@ -20,18 +20,21 @@ Options:
   --version, -v   Show version number                     [boolean]
 
   Examples:
-  match-str "one\ntwo"             Exits 0. Matches by default
-  match-str -i "^tw.+" "one\ntwo"  Exits 0. Matches "two" at line start
-  match-str -e "one" "one\ntwo"    Exits 1 because of "one" exclusion
+  match-str -s "$(printf 'one\ntwo')"              Exits 0. Matches by default.
+  match-str -i "^tw.+" -s "$(printf 'one\ntwo')"   Exits 0. Matches "two" at line start.
+  match-str -e "one" -s "$(printf 'one\ntwo')"     Exits 0. Still matches "two".
+  match-str -e ".*" -s "$(printf 'one\ntwo')"      Exits 1. Everything excluded.
+  match-str -i "^three" -s "$(printf 'one\ntwo')"  Exits 1. No include match.
 ```
 
 ## Notes
 
 * Provides no stdout, just exit process with `0` for match or `1` for no match.
 * Matching logic is:
-    1. If `-i` flags are provided at least one pattern must match.
-    2. If `-e` flags are provided, any match is a failure.
-* Runs regular expressions with `gm` flags.
+    0. Split lines at newline. Then, for each line:
+    1. If `-i` flags are provided, lines are filtered to at least one match.
+    2. If `-e` flags are provided, lines are excluded.
+    3. If any lines remain, process exits `0` else `1`.
 * Can have multiple `-i` and `-e` options.
 
 [npm_img]: https://badge.fury.io/js/match-str.svg
