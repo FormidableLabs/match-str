@@ -3,7 +3,7 @@
 "use strict";
 
 const pkg = require("../package.json");
-const { isMatch } = require("../lib/index");
+const { filter } = require("../lib/index");
 
 const { log, error } = console;
 
@@ -18,9 +18,11 @@ Options:
   --version, -v   Show version number                     [boolean]
 
   Examples:
-  ${pkg.name} "one\\ntwo"             Exits 0. Matches by default
-  ${pkg.name} -i "^tw.+" "one\\ntwo"  Exits 0. Matches "two" at line start
-  ${pkg.name} -e "one" "one\\ntwo"    Exits 1 because of "one" exclusion
+  ${pkg.name} -s "$(printf 'one\\ntwo')"              Exits 0. Matches by default.
+  ${pkg.name} -i "^tw.+" -s "$(printf 'one\\ntwo')"   Exits 0. Matches "two" at line start.
+  ${pkg.name} -e "one" -s "$(printf 'one\\ntwo')"     Exits 0. Still matches "two".
+  ${pkg.name} -e ".*" -s "$(printf 'one\\ntwo')"      Exits 1. Everything excluded.
+  ${pkg.name} -i "^three" -s "$(printf 'one\\ntwo')"  Exits 1. No include match.
 `.trim();
 
 // ============================================================================
@@ -31,8 +33,8 @@ const version = async () => { log(pkg.version); };
 
 // Matches and then **exits process** for upstream usage.
 const matchAndExit = async ({ str, includes, excludes }) => {
-  const matched = isMatch({ str, includes, excludes });
-  process.exit(matched ? 0 : 1); // eslint-disable-line no-process-exit
+  const lines = filter({ str, includes, excludes });
+  process.exit(lines.length ? 0 : 1); // eslint-disable-line no-process-exit
 };
 
 // ============================================================================
