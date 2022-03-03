@@ -41,3 +41,8 @@ Options:
 [npm_site]: http://badge.fury.io/js/match-str
 [trav_img]: https://api.travis-ci.com/FormidableLabs/match-str.svg
 [trav_site]: https://travis-ci.com/FormidableLabs/match-str
+
+
+## Maintenance Status
+
+**Archived:** This project is no longer maintained by Formidable. We are no longer responding to issues or pull requests unless they relate to security concerns. We encourage interested developers to fork this project and make it their own!
